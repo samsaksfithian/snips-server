@@ -19,7 +19,7 @@ const path = require('path');
 /**
  * Selects snippets from db. Can accept optional query object to filter results.
  * @param {Object} [query] the parameters to filter by
- * @returns {Promise<Object[]>}
+ * @returns {Promise<Snippet[]>} array of snippets matching the filter query params
  */
 exports.select = async (query = {}) => {
   try {
