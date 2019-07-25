@@ -44,7 +44,8 @@ exports.insert = async ({ author, code, title, description, language }) => {
 };
 
 /**
- * Selects snippets from db. Can accept optional query object to filter results.
+ * Selects snippets from db. Can accept optional query object
+ * to filter results, otherwise returns all snippets.
  * @param {Object} [query] the parameters to filter by
  * @returns {Promise<Snippet[]>} array of snippets matching the filter query params
  */
@@ -98,7 +99,8 @@ exports.delete = async id => {
   try {
     const snippets = await getSnippetData();
     const filtered = snippets.filter(snippet => snippet.id !== id);
-    if (filtered.length === snippets.length) return;
+    if (filtered.length === snippets.length) return; // short circuit if id not found
+    // TODO: maybe error here?
     await setSnippetData(filtered);
     return snippets.find(snippet => snippet.id === id);
   } catch (err) {
