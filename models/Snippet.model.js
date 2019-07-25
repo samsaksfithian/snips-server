@@ -16,7 +16,7 @@ const { getSnippetData, setSnippetData } = require('../utils/db.utils');
 
 /**
  * Inserts a new snippet into the database
- * @param {Snippet} newSnip the data to create the snippet with
+ * @param {Snippet} newSnippet the data to create the snippet with
  * @returns {Promise<Snippet>} the newly created snippet
  */
 exports.insert = async ({ author, code, title, description, language }) => {
