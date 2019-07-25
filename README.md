@@ -5,7 +5,7 @@ Built with MVC architecture and a file-based DB.
 
 ## Setup
 1. Clone
-2. Run `node index.js`
+2. Run `npm start`
 3. ???
 4. Profit
 
