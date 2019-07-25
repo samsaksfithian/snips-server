@@ -1,6 +1,6 @@
-const fs = require('fs').promises;
-const path = require('path');
+/* eslint-disable no-prototype-builtins */
 const shortid = require('shortid');
+const { getSnippetData, setSnippetData } = require('../utils/db.utils');
 
 /**
  * @typedef {Object} Snippet
@@ -13,17 +13,6 @@ const shortid = require('shortid');
  * @property {string[]} comments
  * @property {number} favorites
  */
-
-const dbpath = path.join(__dirname, '..', 'db', 'snippets.json');
-
-const getSnippetData = async () => {
-  try {
-    return JSON.parse(await fs.readFile(dbpath));
-  } catch (err) {
-    console.error('ERROR: failed to get snippet data');
-    throw err;
-  }
-};
 
 /**
  * Inserts a new snippet into the database
@@ -46,7 +35,7 @@ exports.insert = async ({ author, code, title, description, language }) => {
       comments: [],
       favorites: 0,
     });
-    await fs.writeFile(dbpath, JSON.stringify(snippets));
+    await setSnippetData(snippets);
     return snippets[snippets.length - 1];
   } catch (err) {
     console.error('ERROR: problem inserting snippet', err);
@@ -72,6 +61,48 @@ exports.select = async (query = {}) => {
   }
 };
 
-/* Update  */
+/**
+ * Updates a snippet from the database based on the passed-in id
+ * with the passed in data
+ * @param {string} id the id of the snippet to update
+ * @param {Snippet} updates subset of values to update
+ * @returns {Promise<Snippet>} updated snippet
+ */
+exports.update = async (id, updates) => {
+  try {
+    const snippets = await getSnippetData();
+    let editedSnippet = {};
+    const updatedSnippets = snippets.map(snippet => {
+      if (snippet.id !== id) return snippet;
+      editedSnippet = snippet;
+      Object.keys(updates).forEach(key => {
+        if (key in snippet) snippet[key] = updates[key];
+        // TODO: maybe error if key doesn't exist?
+      });
+      return snippet;
+    });
+    await setSnippetData(updatedSnippets);
+    return editedSnippet;
+  } catch (err) {
+    console.error('ERROR deleting Snippet', err);
+    throw err;
+  }
+};
 
-/* Delete */
+/**
+ * Deletes a snippet from the database based on the passed-in id
+ * @param {string} id the id of the snippet to delete
+ * @returns {Promise<Snippet>} deleted snippet
+ */
+exports.delete = async id => {
+  try {
+    const snippets = await getSnippetData();
+    const filtered = snippets.filter(snippet => snippet.id !== id);
+    if (filtered.length === snippets.length) return;
+    await setSnippetData(filtered);
+    return snippets.find(snippet => snippet.id === id);
+  } catch (err) {
+    console.error('ERROR deleting Snippet', err);
+    throw err;
+  }
+};
