@@ -41,3 +41,16 @@ GET /api/snippets/RQveA9GR0 | 1564160651082
 GET /api/snippets | 1564160656263
 PATCH /api/snippets/1 | 1564160711337
 PATCH /api/snippets/1 | 1564160834114
+PATCH /api/snippets/5 | 1564161357962
+PATCH /api/snippets/5 | 1564161407536
+PATCH /api/snippets/5 | 1564161853687
+PATCH /api/snippets/5 | 1564161861783
+PATCH /api/snippets/5 | 1564162271118
+PATCH /api/snippets/5 | 1564162419689
+PATCH /api/snippets/5 | 1564162434843
+PATCH /api/snippets/5 | 1564162444475
+PATCH /api/snippets/1 | 1564162498566
+PATCH /api/snippets/1 | 1564162501513
+PATCH /api/snippets/1 | 1564162505152
+GET /api/snippets/RQveA9GR0 | 1564162587848
+DELETE /api/snippets/000 | 1564162598270

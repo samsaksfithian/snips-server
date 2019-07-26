@@ -63,7 +63,8 @@ exports.select = async (query = {}) => {
     return filtered;
   } catch (err) {
     // console.error('ERROR in Snippet model', err);
-    throw new ErrorWithHttpStatus('Database error');
+    if (err instanceof ErrorWithHttpStatus) throw err;
+    else throw new ErrorWithHttpStatus('Database error');
   }
 };
 
@@ -77,21 +78,25 @@ exports.select = async (query = {}) => {
 exports.update = async (id, updates) => {
   try {
     const snippets = await getSnippetData();
-    let editedSnippet = {};
+    let editedSnippet = null;
     const updatedSnippets = snippets.map(snippet => {
       if (snippet.id !== id) return snippet;
       editedSnippet = snippet;
       Object.keys(updates).forEach(key => {
         if (key in snippet) snippet[key] = updates[key];
-        // TODO: maybe error if key doesn't exist?
+        else throw new ErrorWithHttpStatus('Trying to update invalid key', 400);
       });
       return snippet;
     });
+    if (!editedSnippet) {
+      throw new ErrorWithHttpStatus('ID not found when trying to update', 404);
+    }
     await setSnippetData(updatedSnippets);
     return editedSnippet;
   } catch (err) {
-    console.error('ERROR deleting Snippet', err);
-    throw err;
+    // console.error('ERROR deleting Snippet', err);
+    if (err instanceof ErrorWithHttpStatus) throw err;
+    else throw new ErrorWithHttpStatus('Database error');
   }
 };
 
@@ -104,14 +109,15 @@ exports.delete = async id => {
   try {
     const snippets = await getSnippetData();
     const index = snippets.findIndex(snippet => snippet.id === id);
-    // short circuit if id not found
-    if (index < 0) return;
-    // TODO: maybe error here?
+    if (index < 0) {
+      throw new ErrorWithHttpStatus('ID not found when trying to delete', 404);
+    }
     const deleted = snippets.splice(index, 1)[0];
     await setSnippetData(snippets);
     return deleted;
   } catch (err) {
-    console.error('ERROR deleting Snippet', err);
-    throw err;
+    // console.error('ERROR deleting Snippet', err);
+    if (err instanceof ErrorWithHttpStatus) throw err;
+    else throw new ErrorWithHttpStatus('Database error');
   }
 };
