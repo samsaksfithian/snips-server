@@ -43,7 +43,7 @@ exports.createSnippet = async (request, response, next) => {
 
 exports.updateSnippet = async (request, response, next) => {
   try {
-    response.send(await Snippet.update(request.params.id, request.query));
+    response.send(await Snippet.update(request.params.id, request.body));
   } catch (err) {
     next(err);
   }
