@@ -28,5 +28,15 @@
     "language": "javascript",
     "comments": [],
     "favorites": 0
+  },
+  {
+    "id": "RQveA9GR0",
+    "author": "Glen",
+    "code": "console.log('Hello world!');",
+    "title": "Hello World",
+    "description": "My first program",
+    "language": "javascript",
+    "comments": [],
+    "favorites": 0
   }
 ]

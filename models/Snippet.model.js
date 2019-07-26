@@ -1,5 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 const shortid = require('shortid');
+const ErrorWithHttpStatus = require('../utils/ErrorWithHttpStatus');
 const { getSnippetData, setSnippetData } = require('../utils/db.utils');
 
 /**
@@ -23,7 +24,10 @@ exports.insert = async ({ author, code, title, description, language }) => {
   try {
     const snippets = await getSnippetData();
     if (!author || !code || !title || !description || !language) {
-      throw Error('missing properties when attempting to create new snippet');
+      throw new ErrorWithHttpStatus(
+        'Missing properties when attempting to create new snippet',
+        400,
+      );
     }
     snippets.push({
       id: shortid.generate(),
@@ -38,8 +42,9 @@ exports.insert = async ({ author, code, title, description, language }) => {
     await setSnippetData(snippets);
     return snippets[snippets.length - 1];
   } catch (err) {
-    console.error('ERROR: problem inserting snippet', err);
-    throw err;
+    // console.error('ERROR: problem inserting snippet', err);
+    if (err instanceof ErrorWithHttpStatus) throw err;
+    else throw new ErrorWithHttpStatus('Database error');
   }
 };
 
@@ -57,8 +62,8 @@ exports.select = async (query = {}) => {
     );
     return filtered;
   } catch (err) {
-    console.error('ERROR in Snippet model', err);
-    throw err;
+    // console.error('ERROR in Snippet model', err);
+    throw new ErrorWithHttpStatus('Database error');
   }
 };
 
@@ -98,11 +103,13 @@ exports.update = async (id, updates) => {
 exports.delete = async id => {
   try {
     const snippets = await getSnippetData();
-    const filtered = snippets.filter(snippet => snippet.id !== id);
-    if (filtered.length === snippets.length) return; // short circuit if id not found
+    const index = snippets.findIndex(snippet => snippet.id === id);
+    // short circuit if id not found
+    if (index < 0) return;
     // TODO: maybe error here?
-    await setSnippetData(filtered);
-    return snippets.find(snippet => snippet.id === id);
+    const deleted = snippets.splice(index, 1)[0];
+    await setSnippetData(snippets);
+    return deleted;
   } catch (err) {
     console.error('ERROR deleting Snippet', err);
     throw err;
