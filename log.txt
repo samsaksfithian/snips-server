@@ -1,3 +1,6 @@
+========== Snips API Log ===========
+== [command] [path] | [timestamp] ==
+====================================
 GET /api | 1564074605708
 POST /api/snippets | 1564077196108
 POST /api/snippets | 1564077212250
@@ -28,3 +31,13 @@ DELETE /api/snippets/RQveA9GR0 | 1564155614792
 DELETE /api/snippets/RQveA9GR0 | 1564155643370
 GET /api/snippets/RQveA9GR0 | 1564155654840
 POST /api/snippets | 1564157270518
+GET /api/snippets | 1564160304836
+GET /api/snippets | 1564160338171
+GET /api/snippets | 1564160346769
+GET /api/snippets | 1564160428681
+GET /api/snippets | 1564160437818
+GET /api/snippets | 1564160444179
+GET /api/snippets/RQveA9GR0 | 1564160651082
+GET /api/snippets | 1564160656263
+PATCH /api/snippets/1 | 1564160711337
+PATCH /api/snippets/1 | 1564160834114

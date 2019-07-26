@@ -5,11 +5,15 @@ const ErrorWithHttpStatus = require('../utils/ErrorWithHttpStatus');
 // =================================================================
 // GET requests
 
-exports.getAllSnippets = async (request, response) => {
-  response.send(await Snippet.select());
+exports.getAllSnippets = async (request, response, next) => {
+  try {
+    response.send(await Snippet.select(request.query));
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getSnippetById = async (request, response) => {
+exports.getSnippetById = async (request, response, next) => {
   try {
     const filtered = await Snippet.select({ id: request.params.id });
     if (filtered.length === 0) {
@@ -17,10 +21,7 @@ exports.getSnippetById = async (request, response) => {
     }
     response.send(filtered[0]);
   } catch (err) {
-    if (err instanceof ErrorWithHttpStatus) {
-      response.status(err.status).send(err.message);
-    }
-    response.status(500).send('Server error');
+    next(err);
   }
 };
 
@@ -28,14 +29,11 @@ exports.getSnippetById = async (request, response) => {
 // =================================================================
 // POST requests
 
-exports.createSnippet = async (request, response) => {
+exports.createSnippet = async (request, response, next) => {
   try {
     response.status(201).send(await Snippet.insert(request.body));
   } catch (err) {
-    if (err instanceof ErrorWithHttpStatus) {
-      response.status(err.status).send(err.message);
-    }
-    response.status(500).send('Server error');
+    next(err);
   }
 };
 
@@ -43,20 +41,24 @@ exports.createSnippet = async (request, response) => {
 // =================================================================
 // PATCH requests
 
-exports.updateSnippet = async (request, response) => {
-  response.send(await Snippet.select());
+exports.updateSnippet = async (request, response, next) => {
+  try {
+    response.send(await Snippet.update(request.params.id, request.query));
+  } catch (err) {
+    next(err);
+  }
 };
 
 // =================================================================
 // =================================================================
 // DELETE requests
 
-exports.deleteSnippet = async (request, response) => {
+exports.deleteSnippet = async (request, response, next) => {
   try {
     const deletedSnip = await Snippet.delete(request.params.id);
     response.send(deletedSnip);
   } catch (err) {
-    console.error(err);
+    next(err);
   }
 };
 
