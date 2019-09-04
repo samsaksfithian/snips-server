@@ -57,8 +57,9 @@ exports.insert = async ({ author, code, title, description, language }) => {
 exports.select = async (query = {}) => {
   try {
     const snippets = await getSnippetData();
-    const filtered = snippets.filter(snippet =>
-      Object.keys(query).every(key => snippet[key] === query[key]),
+    const filtered = snippets.filter(
+      // prettier-ignore
+      snippet => Object.keys(query).every(key => snippet[key] === query[key]),
     );
     return filtered;
   } catch (err) {

@@ -14,5 +14,6 @@ app.use(errorHandler);
 /* Now start our app */
 const default_port = 5555;
 app.listen(process.env.PORT || default_port, () => {
+  // eslint-disable-next-line no-console
   console.log(`Snips server running on port ${process.env.PORT || default_port}`);
 });
