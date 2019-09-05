@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const { logger, router, errorHandler } = require('./middleware');
 
 const app = express();
@@ -12,8 +13,7 @@ app.use(router);
 app.use(errorHandler);
 
 /* Now start our app */
-const default_port = 5555;
-app.listen(process.env.PORT || default_port, () => {
+app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`Snips server running on port ${process.env.PORT || default_port}`);
+  console.log(`Snips server running on port ${process.env.PORT}`);
 });

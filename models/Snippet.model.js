@@ -1,7 +1,10 @@
 /* eslint-disable no-prototype-builtins */
-const shortid = require('shortid');
+const format = require('pg-format');
 const ErrorWithHttpStatus = require('../utils/ErrorWithHttpStatus');
-const { getSnippetData, setSnippetData } = require('../utils/db.utils');
+const db = require('../db');
+// const { getSnippetData, setSnippetData } = require('../utils/db.utils');
+
+const DB_TABLE = 'snippets';
 
 /**
  * @typedef {Object} Snippet
@@ -22,27 +25,17 @@ const { getSnippetData, setSnippetData } = require('../utils/db.utils');
  */
 exports.insert = async ({ author, code, title, description, language }) => {
   try {
-    const snippets = await getSnippetData();
     if (!author || !code || !title || !description || !language) {
-      throw new ErrorWithHttpStatus(
-        'Missing properties when attempting to create new snippet',
-        400,
-      );
+      throw new ErrorWithHttpStatus('Missing properties', 400);
     }
-    snippets.push({
-      id: shortid.generate(),
-      author,
-      code,
-      title,
-      description,
-      language,
-      comments: [],
-      favorites: 0,
-    });
-    await setSnippetData(snippets);
-    return snippets[snippets.length - 1];
+    const result = await db.query(
+      `INSERT INTO  ${DB_TABLE} (author, code, title, description, language)
+      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [author, code, title, description, language],
+    );
+    return result.rows[0];
   } catch (err) {
-    // console.error('ERROR: problem inserting snippet', err);
+    // console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
     else throw new ErrorWithHttpStatus('Database error');
   }
@@ -56,14 +49,29 @@ exports.insert = async ({ author, code, title, description, language }) => {
  */
 exports.select = async (query = {}) => {
   try {
-    const snippets = await getSnippetData();
-    const filtered = snippets.filter(
-      // prettier-ignore
-      snippet => Object.keys(query).every(key => snippet[key] === query[key]),
+    if (Object.keys(query).length === 0) {
+      const all = await db.query(`SELECT * FROM ${DB_TABLE} ORDER BY id`);
+      return all.rows;
+    }
+
+    const filter = Object.keys(query)
+      .reduce((acc, _, i) => `${acc} %I = $${i + 1} AND`, '')
+      .slice(0, -3);
+    // const filter = `${Object.keys(query)
+    //   .map((_, i) => `%I = $${i + 1}`)
+    //   .join(' AND ')}`;
+    // let filter = '';
+    // for (let index = 1; index <= Object.keys(query).length; index++) {
+    //   filter += index !== 1 ? ` AND %I = $${index}` : `%I = $${index}`;
+    // }
+    const formattedSelect = format(
+      `SELECT * FROM ${DB_TABLE} WHERE ${filter} ORDER BY id`,
+      ...Object.keys(query),
     );
-    return filtered;
+    const result = await db.query(formattedSelect, Object.values(query));
+    return result.rows;
   } catch (err) {
-    // console.error('ERROR in Snippet model', err);
+    console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
     else throw new ErrorWithHttpStatus('Database error');
   }
@@ -78,24 +86,20 @@ exports.select = async (query = {}) => {
  */
 exports.update = async (id, updates) => {
   try {
-    const snippets = await getSnippetData();
-    let editedSnippet = null;
-    const updatedSnippets = snippets.map(snippet => {
-      if (snippet.id !== id) return snippet;
-      editedSnippet = snippet;
-      Object.keys(updates).forEach(key => {
-        if (key in snippet) snippet[key] = updates[key];
-        else throw new ErrorWithHttpStatus('Trying to update invalid key', 400);
-      });
-      return snippet;
-    });
-    if (!editedSnippet) {
-      throw new ErrorWithHttpStatus('ID not found when trying to update', 404);
-    }
-    await setSnippetData(updatedSnippets);
-    return editedSnippet;
+    const { author, code, title, description, language } = updates;
+    const result = await db.query(
+      `UPDATE ${DB_TABLE} SET 
+        author = COALESCE($2, author),
+        code = COALESCE($3, code),
+        title = COALESCE($4, title),
+        description = COALESCE($5, description),
+        language=COALESCE($6, language)
+      WHERE id = ($1) RETURNING *`,
+      [id, author, code, title, description, language],
+    );
+    return result.rows[0];
   } catch (err) {
-    // console.error('ERROR deleting Snippet', err);
+    // console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
     else throw new ErrorWithHttpStatus('Database error');
   }
@@ -108,16 +112,9 @@ exports.update = async (id, updates) => {
  */
 exports.delete = async id => {
   try {
-    const snippets = await getSnippetData();
-    const index = snippets.findIndex(snippet => snippet.id === id);
-    if (index < 0) {
-      throw new ErrorWithHttpStatus('ID not found when trying to delete', 404);
-    }
-    const deleted = snippets.splice(index, 1)[0];
-    await setSnippetData(snippets);
-    return deleted;
+    return db.query(`DELETE FROM snippets WHERE id = ${id}`);
   } catch (err) {
-    // console.error('ERROR deleting Snippet', err);
+    // console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
     else throw new ErrorWithHttpStatus('Database error');
   }

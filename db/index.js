@@ -1,21 +1,11 @@
 const pg = require('pg');
+require('dotenv').config();
+
+const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_DATABASE } = process.env;
 
 // how to reach my database
-const connectionString = `postgresql://ssaksfithian:password@localhost:5432/snips`;
-const client = new pg.Client(connectionString);
+const connectionString = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}`;
 
-// opens a single connection to the database
-client.connect();
+const pool = new pg.Pool({ connectionString });
 
-client
-  .query('SELECT * FROM snippets')
-  .then(result => {
-    // eslint-disable-next-line no-console
-    console.table(result.rows);
-  })
-  .catch(err => {
-    console.error(err);
-  })
-  .finally(() => {
-    client.end();
-  });
+module.exports = pool;
