@@ -37,7 +37,7 @@ exports.insert = async ({ author, code, title, description, language }) => {
   } catch (err) {
     // console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
-    else throw new ErrorWithHttpStatus('Database error');
+    else throw new ErrorWithHttpStatus('Database error (Snippet Insert)');
   }
 };
 
@@ -71,9 +71,9 @@ exports.select = async (query = {}) => {
     const result = await db.query(formattedSelect, Object.values(query));
     return result.rows;
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
-    else throw new ErrorWithHttpStatus('Database error');
+    else throw new ErrorWithHttpStatus('Database error (Snippet Select)');
   }
 };
 
@@ -101,7 +101,7 @@ exports.update = async (id, updates) => {
   } catch (err) {
     // console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
-    else throw new ErrorWithHttpStatus('Database error');
+    else throw new ErrorWithHttpStatus('Database error (Snippet Update)');
   }
 };
 
@@ -116,6 +116,6 @@ exports.delete = async id => {
   } catch (err) {
     // console.error(err);
     if (err instanceof ErrorWithHttpStatus) throw err;
-    else throw new ErrorWithHttpStatus('Database error');
+    else throw new ErrorWithHttpStatus('Database error (Snippet Delete)');
   }
 };
