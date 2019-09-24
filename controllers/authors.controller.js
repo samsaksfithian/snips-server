@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const Author = require('../models/Author.model');
+const ErrorWithHttpStatus = require('../utils/ErrorWithHttpStatus');
 
 const HASH_SALT = 3;
 
@@ -22,13 +24,13 @@ exports.logIn = async (request, response, next) => {
     if (!request.body.username || !request.body.password) {
       response.status(400).send('Missing username or password');
     }
-    const user = (await Author.select(request.body.username))[0];
-    const match = await bcrypt.compare(request.body.password, user.password);
-    if (match) {
-      response.status(200).send('Successfully logged in!');
-    } else {
-      response.status(400).send('Incorrect password');
-    }
+    const author = (await Author.select(request.body.username))[0];
+    if (!author) throw new ErrorWithHttpStatus('User does not exist', 404);
+    const isMatch = await bcrypt.compare(request.body.password, author.password);
+    if (!isMatch) throw new ErrorWithHttpStatus('Incorrect password', 401);
+
+    const token = jwt.sign(author.username, process.env.JWT_SECRET);
+    response.status(200).send({ message: 'Successfully logged in!', token });
   } catch (err) {
     next(err);
   }
