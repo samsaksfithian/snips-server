@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-console */
 const Snippet = require('./models/Snippet.model');
 
 async function testSnippetInsert() {

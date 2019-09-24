@@ -1,7 +1,7 @@
 const db = require('../db');
 const ErrorWithHttpStatus = require('../utils/ErrorWithHttpStatus');
 
-const DB_TABLE = 'author';
+const DB_TABLE = 'authors';
 
 /**
  * @typedef {Object} Author
