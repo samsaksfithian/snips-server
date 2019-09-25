@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/samsaksfithian/snips-server.svg?branch=master)](https://travis-ci.com/samsaksfithian/snips-server)
+
 # Snips ✂ Server Backend
 
 Backend for Snips app.
