@@ -3,12 +3,10 @@ require('dotenv').config();
 const request = require('supertest');
 const app = require('../app');
 const db = require('../db');
-const dbInit = require('../db/init_testing');
+const dbInit = require('../db/init');
 
 beforeAll(async () => {
-  await dbInit.createTables();
-  await dbInit.seedAuthors();
-  await dbInit.seedSnippets();
+  await dbInit.init(true);
 });
 
 describe('Snippets', () => {

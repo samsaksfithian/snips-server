@@ -3,22 +3,22 @@
 exports[`Snippets GET /api/snippets should get all of the snippets 1`] = `
 Array [
   Object {
-    "author": "Dandy",
-    "code": "const america = 1776",
-    "description": "I declared a const",
-    "favorites": 0,
-    "id": 1,
-    "language": "JavaScript",
-    "title": "freedom",
-  },
-  Object {
-    "author": "Scott",
+    "author": "Dean",
     "code": "4 + 4",
     "description": "This is how you add",
     "favorites": 0,
-    "id": 2,
+    "id": 1,
     "language": "Algebra",
-    "title": "addition",
+    "title": "Addition",
+  },
+  Object {
+    "author": "Emily",
+    "code": "console.log(\\"Hello world!\\");",
+    "description": "My first program",
+    "favorites": 0,
+    "id": 2,
+    "language": "javascript",
+    "title": "Hello World",
   },
 ]
 `;
