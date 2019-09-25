@@ -44,9 +44,8 @@ const START_SNIPPETS = [
   },
 ];
 
-async function init() {
-  await db.query(
-    `DROP TABLE IF EXISTS snippets;
+const createTables = () =>
+  db.query(`DROP TABLE IF EXISTS snippets;
     DROP TABLE IF EXISTS authors;
     CREATE TABLE authors (username TEXT PRIMARY KEY, password TEXT);
     CREATE TABLE snippets (
@@ -57,15 +56,33 @@ async function init() {
       favorites INT DEFAULT 0,
       author TEXT REFERENCES authors,
       language TEXT
-    );`,
-  );
+    );`);
 
+const seedAuthors = async () => {
+  await db.query(`DELETE FROM authors`);
   const authorPromises = START_AUTHORS.map(async author => {
     const hashedPass = await bcrypt.hash(author.password, HASH_SALT);
     return Author.insert({ username: author.username, password: hashedPass });
   });
-  await Promise.all(authorPromises);
-  START_SNIPPETS.forEach(snippet => Snippet.insert(snippet));
-}
+  return Promise.all(authorPromises);
+};
 
-init();
+const seedSnippets = async () => {
+  await db.query(`DELETE FROM snippets`);
+  return START_SNIPPETS.forEach(snippet => Snippet.insert(snippet));
+};
+
+const init = async () => {
+  await createTables();
+  await seedAuthors();
+  await seedSnippets();
+};
+
+module.exports = {
+  START_SNIPPETS,
+  START_AUTHORS,
+  createTables,
+  seedAuthors,
+  seedSnippets,
+  init,
+};

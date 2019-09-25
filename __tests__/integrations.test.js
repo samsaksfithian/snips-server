@@ -3,7 +3,7 @@ require('dotenv').config();
 const request = require('supertest');
 const app = require('../app');
 const db = require('../db');
-const dbInit = require('../db/db_init');
+const dbInit = require('../db/init_testing');
 
 beforeAll(async () => {
   await dbInit.createTables();
